@@ -1,0 +1,134 @@
+---
+import qs from "qs";
+import ArticleCard from "../../components/ArticleCard";
+import ArticleList from "../../components/ArticleList";
+
+import type Article from "../../interfaces/article";
+import Layout from "../../layouts/Layout.astro";
+import fetchApi from "../../lib/strapi";
+import ArticleSkeleton from "../../components/ArticlesLoadingSkeleton";
+
+export const prerender = false;
+
+const page = Astro.url.searchParams.get("page") || 1;
+const searchQuery = Astro.url.searchParams.get("search") || "";
+const pageSize = 4;
+
+const query = qs.stringify(
+  {
+    pagination: {
+      page: page,
+      pageSize: pageSize,
+    },
+    populate: {
+      image: { populate: true },
+      tags: { populate: true },
+      author: {
+        populate: {
+          image: { populate: "*" },
+        },
+      },
+      category: {
+        populate: true,
+      },
+    },
+    filters: {
+      title: {
+        $contains: searchQuery,
+      },
+    },
+  },
+  { encode: false }
+);
+
+const resp = await fetchApi<{
+  data: Article[];
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+}>({
+  endpoint: "articles",
+  query: query,
+});
+
+const { data: articles, meta, loading } = resp;
+---
+
+<Layout>
+  <div class="w-full max-w-7xl mx-auto px-4 py-8">
+    <div class="flex justify-center mb-8">
+      <form action="/blog" method="GET" class="w-full max-w-md">
+        <div class="flex gap-2">
+          <input
+            type="text"
+            name="search"
+            placeholder="Search by title..."
+            value={searchQuery}
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          />
+          <button
+            type="submit"
+            class="cursor-pointer px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+          >
+            Search
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="min-h-[500px]">
+      <ArticleList articles={articles} />
+    </div>
+
+    <nav
+      class="h-16 mt-8 flex justify-center items-center border-t border-gray-200"
+    >
+      <div class="flex items-center gap-4">
+        {
+          meta.pagination.page > 1 ? (
+            <a
+              href={`/blog?page=${meta.pagination.page - 1}${searchQuery ? `&search=${searchQuery}` : ""}`}
+              class="inline-block px-5 py-2 bg-blue-600 text-white font-medium rounded-md shadow hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 no-underline"
+            >
+              Previous
+            </a>
+          ) : (
+            <span
+              class="inline-block px-5 py-2 bg-gray-300 text-gray-500 font-medium rounded-md shadow cursor-not-allowed"
+              aria-disabled="true"
+            >
+              Previous
+            </span>
+          )
+        }
+
+        <span class="px-4 py-2 text-gray-600">
+          Page {meta.pagination.page} of {meta.pagination.pageCount}
+        </span>
+
+        {
+          meta.pagination.page < meta.pagination.pageCount ? (
+            <a
+              href={`/blog?page=${meta.pagination.page + 1}${searchQuery ? `&search=${searchQuery}` : ""}`}
+              class="inline-block px-5 py-2 bg-blue-600 text-white font-medium rounded-md shadow hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 no-underline"
+            >
+              Next
+            </a>
+          ) : (
+            <span
+              class="inline-block px-5 py-2 bg-gray-300 text-gray-500 font-medium rounded-md shadow cursor-not-allowed"
+              aria-disabled="true"
+            >
+              Next
+            </span>
+          )
+        }
+      </div>
+    </nav>
+  </div>
+</Layout>

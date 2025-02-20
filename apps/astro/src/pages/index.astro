@@ -1,0 +1,37 @@
+---
+import "../styles/global.css";
+
+import fetchApi from "../lib/strapi";
+import type Article from "../interfaces/article";
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import ArticleList from "../components/ArticleList";
+import IndexTitle from "../components/IndexTitle";
+import Layout from "../layouts/Layout.astro";
+const articles = await fetchApi<Article[]>({
+  endpoint: "articles", // the content type to fetch
+  query: {
+    populate: "*",
+  },
+  wrappedByKey: "data", // the key to unwrap the response
+});
+---
+
+<Layout>
+  <div class="min-h-[80vh] flex items-center justify-center">
+    <div class="w-fit max-w-3xl p-3 text-center">
+      <IndexTitle />
+
+      <div class="mt-6">
+        <a
+          href="/blog"
+          class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition-all"
+        >
+          Read Blogs
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

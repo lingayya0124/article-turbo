@@ -1,0 +1,92 @@
+---
+import fetchApi from "../../lib/strapi";
+import type Article from "../../interfaces/article";
+import Layout from "../../layouts/Layout.astro";
+import ArticleAuthor from "../../components/Author.tsx";
+import YouTubeEmbed from "../../components/YoutubeEmbed.astro";
+import { Image } from "astro:assets";
+import { marked } from "marked";
+import { getCollection, render } from "astro:content";
+import qs from "qs";
+import React from "react";
+export async function getStaticPaths() {
+  const query = qs.stringify(
+    {
+      populate: {
+        image: { populate: true },
+        tags: { populate: true },
+        author: {
+          populate: {
+            image: { populate: "*" },
+          },
+        },
+      },
+    },
+    { encode: false }
+  );
+  const articles = await fetchApi<Article[]>({
+    endpoint: "articles",
+    wrappedByKey: "data",
+    query: query,
+  });
+
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+    props: article,
+  }));
+}
+
+type Props = Article;
+
+const article = Astro.props;
+---
+
+<Layout>
+  <div class="max-w-[680px] mx-auto mt-10 text-center">
+    <h1 class="text-4xl font-bold">{article.title}</h1>
+    <div class="flex ml-4 mb-5 justify-start gap-2 items-center mt-4">
+      <span class="text-sm font-bold">Tags:</span>
+      {
+        article.tags.map((tag) => (
+          <span class="inline-flex items-center px-2 py-0.5 rounded-xl text-xs font-medium bg-orange-400 text-amber-50 cursor-pointer hover:opacity-80 transition-opacity">
+            {tag.name}
+          </span>
+        ))
+      }
+    </div>
+    {
+      article.author && (
+        <ArticleAuthor
+          articlePublishedDate={article.publishedAt}
+          author={article.author}
+        />
+      )
+    }
+
+    <p class="text-lg text-left text-gray-700 mb-4">{article.description}</p>
+
+    {
+      article.image && (
+        <div class="flex justify-center">
+          <img
+            src={`${import.meta.env.STRAPI_URL}${article.image.url}`}
+            alt={article.title}
+            class="w-full max-w-[680px] h-auto rounded-lg mb-8"
+          />
+        </div>
+      )
+    }
+
+    <div class="max-w-[680px] mx-auto text-left">
+      <div class="prose lg:prose-xl" set:html={marked.parse(article.content)} />
+    </div>
+
+    {
+      article.youtubeLink && (
+        <div class="flex justify-center my-5">
+          <YouTubeEmbed videoId={article.youtubeLink} />
+        </div>
+      )
+    }
+  </div>
+</Layout>
