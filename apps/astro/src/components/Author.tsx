@@ -12,7 +12,7 @@ export default function ArticleAuthor({
     <div className="border-t">
       <div className="py-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-          <image
+          <img
             src={import.meta.env.STRAPI_URL + author.image.url}
             alt={author.name}
             className="h-20 w-20 rounded-full object-cover sm:h-24 sm:w-24"

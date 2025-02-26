@@ -39,6 +39,13 @@ export async function getStaticPaths() {
 type Props = Article;
 
 const article = Astro.props;
+
+const mainImage = article.image
+  ? {
+      url: `${import.meta.env.STRAPI_URL}${article.image.url}`,
+      alt: article.title,
+    }
+  : null;
 ---
 
 <Layout>
@@ -47,11 +54,12 @@ const article = Astro.props;
     <div class="flex ml-4 mb-5 justify-start gap-2 items-center mt-4">
       <span class="text-sm font-bold">Tags:</span>
       {
-        article.tags.map((tag) => (
-          <span class="inline-flex items-center px-2 py-0.5 rounded-xl text-xs font-medium bg-orange-400 text-amber-50 cursor-pointer hover:opacity-80 transition-opacity">
-            {tag.name}
-          </span>
-        ))
+        article.tags.length > 0 &&
+          article.tags.map((tag) => (
+            <span class="inline-flex items-center px-2 py-0.5 rounded-xl text-xs font-medium bg-orange-400 text-white cursor-pointer hover:opacity-80 transition-opacity">
+              {tag.name}
+            </span>
+          ))
       }
     </div>
     {
@@ -68,9 +76,13 @@ const article = Astro.props;
     {
       article.image && (
         <div class="flex justify-center">
-          <img
-            src={`${import.meta.env.STRAPI_URL}${article.image.url}`}
-            alt={article.title}
+          <Image
+            src={mainImage.url}
+            alt={mainImage.alt}
+            width={680}
+            height={440}
+            quality={80}
+            decoding="async"
             class="w-full max-w-[680px] h-auto rounded-lg mb-8"
           />
         </div>

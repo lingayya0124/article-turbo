@@ -1,5 +1,7 @@
 ---
 import Layout from "../layouts/BlogPost.astro";
+import AboutImage from "../../public/20945597.jpg";
+import Image from "astro/components/Image.astro";
 ---
 
 <Layout
@@ -15,7 +17,14 @@ import Layout from "../layouts/BlogPost.astro";
     informed and ahead of the curve. Whether it's emerging trends, new software,
     or the future of tech, we've got it covered.
   </p>
-
+  <Image
+    src={AboutImage}
+    alt={"sfsdf"}
+    width={680}
+    height={440}
+    decoding="async"
+    class="w-full max-w-[680px] h-auto rounded-lg mb-8"
+  />
   <p>
     Our team of experts works tirelessly to bring you high-quality content,
     focusing on what matters most in the ever-evolving tech landscape. From
