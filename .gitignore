@@ -4,7 +4,9 @@
 node_modules
 .pnp
 .pnp.js
-
+.astro
+.tmp
+.strapi-updater.json
 # Local env files
 .env
 .env.local

@@ -35,7 +35,7 @@ const query = qs.stringify(
     },
     filters: {
       title: {
-        $contains: searchQuery,
+        $containsi: searchQuery,
       },
     },
   },
@@ -57,7 +57,7 @@ const resp = await fetchApi<{
   query: query,
 });
 
-const { data: articles, meta, loading } = resp;
+const { data: articles, meta } = resp;
 ---
 
 <Layout>

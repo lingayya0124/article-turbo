@@ -52,14 +52,17 @@ const mainImage = article.image
   <div class="max-w-[680px] mx-auto mt-10 text-center">
     <h1 class="text-4xl font-bold">{article.title}</h1>
     <div class="flex ml-4 mb-5 justify-start gap-2 items-center mt-4">
-      <span class="text-sm font-bold">Tags:</span>
       {
-        article.tags.length > 0 &&
-          article.tags.map((tag) => (
-            <span class="inline-flex items-center px-2 py-0.5 rounded-xl text-xs font-medium bg-orange-400 text-white cursor-pointer hover:opacity-80 transition-opacity">
-              {tag.name}
-            </span>
-          ))
+        article.tags.length > 0 && (
+          <>
+            <span class="text-sm font-bold">Tags:</span>
+            {article.tags.map((tag) => (
+              <span class="inline-flex items-center px-2 py-0.5 rounded-xl text-xs font-medium bg-orange-400 text-white cursor-pointer hover:opacity-80 transition-opacity">
+                {tag.name}
+              </span>
+            ))}
+          </>
+        )
       }
     </div>
     {
@@ -77,8 +80,8 @@ const mainImage = article.image
       article.image && (
         <div class="flex justify-center">
           <Image
-            src={mainImage.url}
-            alt={mainImage.alt}
+            src={mainImage!.url}
+            alt={mainImage!.alt}
             width={680}
             height={440}
             quality={80}
